@@ -1,5 +1,6 @@
 package com.luiz.autocare.autocare_scheduler.handler;
 
+import com.luiz.autocare.autocare_scheduler.exception.AppointmentConflictException;
 import com.luiz.autocare.autocare_scheduler.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handleIllegalState(IllegalStateException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(AppointmentConflictException.class)
+    public ResponseEntity<String> handleAppointmentConflict(AppointmentConflictException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 }

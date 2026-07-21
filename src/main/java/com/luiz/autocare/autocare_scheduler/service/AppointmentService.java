@@ -1,6 +1,7 @@
 package com.luiz.autocare.autocare_scheduler.service;
 
 import com.luiz.autocare.autocare_scheduler.dto.AppointmentDTO;
+import com.luiz.autocare.autocare_scheduler.exception.AppointmentConflictException;
 import com.luiz.autocare.autocare_scheduler.exception.ResourceNotFoundException;
 import com.luiz.autocare.autocare_scheduler.model.Appointment;
 import com.luiz.autocare.autocare_scheduler.model.AppointmentStatus;
@@ -13,10 +14,13 @@ import com.luiz.autocare.autocare_scheduler.repository.ServiceTypeRepository;
 import com.luiz.autocare.autocare_scheduler.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 public class AppointmentService {
+
+    private static final long CONFLICT_WINDOW_MINUTES = 30L;
 
     private final AppointmentRepository appointmentRepository;
     private final ClientRepository clientRepository;
@@ -51,6 +55,13 @@ public class AppointmentService {
         ServiceType serviceType = serviceTypeRepository.findById(dto.getServiceTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Service type not found"));
 
+        LocalDateTime start = dto.getScheduledDateTime().minusMinutes(CONFLICT_WINDOW_MINUTES);
+        LocalDateTime end = dto.getScheduledDateTime().plusMinutes(CONFLICT_WINDOW_MINUTES);
+        List<Appointment> conflicts = appointmentRepository.findByScheduledDateTimeBetweenAndStatusNot(start, end, AppointmentStatus.CANCELLED);
+        if (!conflicts.isEmpty()) {
+            throw new AppointmentConflictException("Requested time conflicts with an existing appointment");
+        }
+
         Appointment appointment = new Appointment();
         appointment.setClient(client);
         appointment.setVehicle(vehicle);
@@ -70,6 +81,15 @@ public class AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
         ServiceType serviceType = serviceTypeRepository.findById(dto.getServiceTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Service type not found"));
+
+        LocalDateTime start = dto.getScheduledDateTime().minusMinutes(CONFLICT_WINDOW_MINUTES);
+        LocalDateTime end = dto.getScheduledDateTime().plusMinutes(CONFLICT_WINDOW_MINUTES);
+        List<Appointment> conflicts = appointmentRepository.findByScheduledDateTimeBetweenAndStatusNot(start, end, AppointmentStatus.CANCELLED);
+        // ignore self
+        conflicts.removeIf(a -> a.getId().equals(id));
+        if (!conflicts.isEmpty()) {
+            throw new AppointmentConflictException("Requested time conflicts with an existing appointment");
+        }
 
         appointment.setClient(client);
         appointment.setVehicle(vehicle);
