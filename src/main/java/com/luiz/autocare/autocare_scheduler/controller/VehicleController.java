@@ -4,6 +4,9 @@ import com.luiz.autocare.autocare_scheduler.dto.VehicleDTO;
 import com.luiz.autocare.autocare_scheduler.model.Vehicle;
 import com.luiz.autocare.autocare_scheduler.service.VehicleService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +24,8 @@ public class VehicleController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Vehicle>> findAll() {
-        return ResponseEntity.ok(vehicleService.findAll());
+    public ResponseEntity<Page<Vehicle>> findAll(@PageableDefault(size = 20) Pageable pageable) {
+        return ResponseEntity.ok(vehicleService.findAll(pageable));
     }
 
     @GetMapping("/{id}")

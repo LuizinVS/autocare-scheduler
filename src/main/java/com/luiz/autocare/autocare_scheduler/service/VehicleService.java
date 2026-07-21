@@ -9,6 +9,8 @@ import com.luiz.autocare.autocare_scheduler.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class VehicleService {
@@ -21,8 +23,8 @@ public class VehicleService {
         this.clientRepository = clientRepository;
     }
 
-    public List<Vehicle> findAll() {
-        return vehicleRepository.findAll();
+    public Page<Vehicle> findAll(Pageable pageable) {
+        return vehicleRepository.findAll(pageable);
     }
 
     public Vehicle findById(Long id) {

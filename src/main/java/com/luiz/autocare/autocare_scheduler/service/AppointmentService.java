@@ -43,11 +43,11 @@ public class AppointmentService {
         this.serviceTypeRepository = serviceTypeRepository;
     }
 
-    public List<Appointment> findAll() {
-        return findAll(null, null, null);
+    public org.springframework.data.domain.Page<Appointment> findAll(org.springframework.data.domain.Pageable pageable) {
+        return findAll(null, null, null, pageable);
     }
 
-    public java.util.List<Appointment> findAll(AppointmentStatus status, java.time.LocalDate date, Long clientId) {
+    public org.springframework.data.domain.Page<Appointment> findAll(AppointmentStatus status, java.time.LocalDate date, Long clientId, org.springframework.data.domain.Pageable pageable) {
         org.springframework.data.jpa.domain.Specification<Appointment> spec = org.springframework.data.jpa.domain.Specification.where(null);
 
         if (status != null) {
@@ -64,7 +64,7 @@ public class AppointmentService {
             spec = spec.and((root, cq, cb) -> cb.equal(root.get("client").get("id"), clientId));
         }
 
-        return appointmentRepository.findAll(spec);
+        return appointmentRepository.findAll(spec, pageable);
     }
 
     public Appointment findById(Long id) {

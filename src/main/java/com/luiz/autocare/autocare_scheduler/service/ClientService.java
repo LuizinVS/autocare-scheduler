@@ -4,9 +4,9 @@ import com.luiz.autocare.autocare_scheduler.dto.ClientDTO;
 import com.luiz.autocare.autocare_scheduler.exception.ResourceNotFoundException;
 import com.luiz.autocare.autocare_scheduler.model.Client;
 import com.luiz.autocare.autocare_scheduler.repository.ClientRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ClientService {
@@ -17,8 +17,8 @@ public class ClientService {
         this.clientRepository = clientRepository;
     }
 
-    public List<Client> findAll() {
-        return clientRepository.findAll();
+    public Page<Client> findAll(Pageable pageable) {
+        return clientRepository.findAll(pageable);
     }
 
     public Client findById(Long id) {
