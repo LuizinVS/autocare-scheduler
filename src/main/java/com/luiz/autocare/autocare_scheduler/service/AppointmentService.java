@@ -58,4 +58,23 @@ public class AppointmentService {
 
         return appointmentRepository.save(appointment);
     }
+
+    public Appointment updateAppointment(Long id, AppointmentDTO dto) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        Client client = clientRepository.findById(dto.getClientId())
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+        Vehicle vehicle = vehicleRepository.findById(dto.getVehicleId())
+                .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
+        ServiceType serviceType = serviceTypeRepository.findById(dto.getServiceTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Service type not found"));
+
+        appointment.setClient(client);
+        appointment.setVehicle(vehicle);
+        appointment.setServiceType(serviceType);
+        appointment.setScheduledDateTime(dto.getScheduledDateTime());
+
+        return appointmentRepository.save(appointment);
+    }
 }

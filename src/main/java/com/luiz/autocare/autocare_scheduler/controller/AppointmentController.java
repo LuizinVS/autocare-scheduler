@@ -35,4 +35,10 @@ public class AppointmentController {
         Appointment saved = appointmentService.createAppointment(dto);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Appointment> updateAppointment(@PathVariable Long id, @Valid @RequestBody AppointmentDTO dto) {
+        Appointment updated = appointmentService.updateAppointment(id, dto);
+        return ResponseEntity.ok(updated);
+    }
 }
