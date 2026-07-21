@@ -49,6 +49,12 @@ public class AppointmentController {
         return ResponseEntity.ok(updated);
     }
 
+    @GetMapping("/availability")
+    public ResponseEntity<List<String>> getAvailability(@RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date) {
+        List<String> available = appointmentService.getAvailability(date);
+        return ResponseEntity.ok(available);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
         appointmentService.deleteAppointment(id);

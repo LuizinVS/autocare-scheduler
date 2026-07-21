@@ -14,13 +14,18 @@ import com.luiz.autocare.autocare_scheduler.repository.ServiceTypeRepository;
 import com.luiz.autocare.autocare_scheduler.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class AppointmentService {
 
     private static final long CONFLICT_WINDOW_MINUTES = 30L;
+    private static final LocalTime WORK_START = LocalTime.of(8, 0);
+    private static final LocalTime WORK_END = LocalTime.of(18, 0);
+    private static final int SLOT_MINUTES = 30;
 
     private final AppointmentRepository appointmentRepository;
     private final ClientRepository clientRepository;
@@ -112,6 +117,26 @@ public class AppointmentService {
 
         appointment.setStatus(newStatus);
         return appointmentRepository.save(appointment);
+    }
+
+    public List<String> getAvailability(java.time.LocalDate date) {
+        LocalDateTime dayStart = date.atStartOfDay();
+        LocalDateTime dayEnd = date.atTime(23, 59, 59);
+        List<Appointment> appointments = appointmentRepository.findByScheduledDateTimeBetweenAndStatusNot(dayStart, dayEnd, AppointmentStatus.CANCELLED);
+
+        List<String> available = new ArrayList<>();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("HH:mm");
+
+        for (LocalTime time = WORK_START; !time.isAfter(WORK_END.minusMinutes(SLOT_MINUTES)); time = time.plusMinutes(SLOT_MINUTES)) {
+            LocalDateTime slotDateTime = LocalDateTime.of(date, time);
+            boolean occupied = appointments.stream()
+                    .anyMatch(a -> Math.abs(Duration.between(slotDateTime, a.getScheduledDateTime()).toMinutes()) <= CONFLICT_WINDOW_MINUTES);
+            if (!occupied) {
+                available.add(time.format(fmt));
+            }
+        }
+
+        return available;
     }
 
     public void deleteAppointment(Long id) {
