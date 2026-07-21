@@ -3,6 +3,7 @@ package com.luiz.autocare.autocare_scheduler.service;
 import com.luiz.autocare.autocare_scheduler.dto.AppointmentDTO;
 import com.luiz.autocare.autocare_scheduler.exception.ResourceNotFoundException;
 import com.luiz.autocare.autocare_scheduler.model.Appointment;
+import com.luiz.autocare.autocare_scheduler.model.AppointmentStatus;
 import com.luiz.autocare.autocare_scheduler.model.Client;
 import com.luiz.autocare.autocare_scheduler.model.ServiceType;
 import com.luiz.autocare.autocare_scheduler.model.Vehicle;
@@ -75,6 +76,21 @@ public class AppointmentService {
         appointment.setServiceType(serviceType);
         appointment.setScheduledDateTime(dto.getScheduledDateTime());
 
+        return appointmentRepository.save(appointment);
+    }
+
+    public Appointment updateStatus(Long id, AppointmentStatus newStatus) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));
+
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot change status of a cancelled appointment");
+        }
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new IllegalStateException("Cannot change status of a completed appointment");
+        }
+
+        appointment.setStatus(newStatus);
         return appointmentRepository.save(appointment);
     }
 }

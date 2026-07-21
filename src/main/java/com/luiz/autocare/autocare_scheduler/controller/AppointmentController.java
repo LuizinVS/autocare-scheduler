@@ -1,6 +1,7 @@
 package com.luiz.autocare.autocare_scheduler.controller;
 
 import com.luiz.autocare.autocare_scheduler.dto.AppointmentDTO;
+import com.luiz.autocare.autocare_scheduler.dto.AppointmentStatusUpdateDTO;
 import com.luiz.autocare.autocare_scheduler.model.Appointment;
 import com.luiz.autocare.autocare_scheduler.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -39,6 +40,12 @@ public class AppointmentController {
     @PutMapping("/{id}")
     public ResponseEntity<Appointment> updateAppointment(@PathVariable Long id, @Valid @RequestBody AppointmentDTO dto) {
         Appointment updated = appointmentService.updateAppointment(id, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Appointment> updateStatus(@PathVariable Long id, @Valid @RequestBody AppointmentStatusUpdateDTO dto) {
+        Appointment updated = appointmentService.updateStatus(id, dto.getStatus());
         return ResponseEntity.ok(updated);
     }
 }
