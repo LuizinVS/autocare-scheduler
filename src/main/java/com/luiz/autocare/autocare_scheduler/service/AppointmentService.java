@@ -44,7 +44,27 @@ public class AppointmentService {
     }
 
     public List<Appointment> findAll() {
-        return appointmentRepository.findAll();
+        return findAll(null, null, null);
+    }
+
+    public java.util.List<Appointment> findAll(AppointmentStatus status, java.time.LocalDate date, Long clientId) {
+        org.springframework.data.jpa.domain.Specification<Appointment> spec = org.springframework.data.jpa.domain.Specification.where(null);
+
+        if (status != null) {
+            spec = spec.and((root, cq, cb) -> cb.equal(root.get("status"), status));
+        }
+
+        if (date != null) {
+            java.time.LocalDateTime start = date.atStartOfDay();
+            java.time.LocalDateTime end = date.atTime(23, 59, 59);
+            spec = spec.and((root, cq, cb) -> cb.between(root.get("scheduledDateTime"), start, end));
+        }
+
+        if (clientId != null) {
+            spec = spec.and((root, cq, cb) -> cb.equal(root.get("client").get("id"), clientId));
+        }
+
+        return appointmentRepository.findAll(spec);
     }
 
     public Appointment findById(Long id) {
@@ -137,8 +157,14 @@ public class AppointmentService {
         }
 
         return available;
+
     }
 
+    public List<com.luiz.autocare.autocare_scheduler.model.Appointment> findByClientId(Long clientId) {
+        clientRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+        return appointmentRepository.findByClientId(clientId);
+    }
     public void deleteAppointment(Long id) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found"));

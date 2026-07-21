@@ -3,6 +3,7 @@ package com.luiz.autocare.autocare_scheduler.controller;
 import com.luiz.autocare.autocare_scheduler.dto.AppointmentDTO;
 import com.luiz.autocare.autocare_scheduler.dto.AppointmentStatusUpdateDTO;
 import com.luiz.autocare.autocare_scheduler.model.Appointment;
+import com.luiz.autocare.autocare_scheduler.model.AppointmentStatus;
 import com.luiz.autocare.autocare_scheduler.service.AppointmentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,12 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Appointment>> findAll() {
-        return ResponseEntity.ok(appointmentService.findAll());
+    public ResponseEntity<List<Appointment>> findAll(
+            @RequestParam(required = false) AppointmentStatus status,
+            @RequestParam(required = false) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date,
+            @RequestParam(required = false) Long clientId
+    ) {
+        return ResponseEntity.ok(appointmentService.findAll(status, date, clientId));
     }
 
     @GetMapping("/{id}")

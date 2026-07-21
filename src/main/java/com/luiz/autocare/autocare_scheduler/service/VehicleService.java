@@ -42,4 +42,10 @@ public class VehicleService {
 
         return vehicleRepository.save(vehicle);
     }
+
+    public List<Vehicle> findByClientId(Long clientId) {
+        clientRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+        return vehicleRepository.findByClientId(clientId);
+    }
 }
