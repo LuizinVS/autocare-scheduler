@@ -19,7 +19,7 @@ services:
       retries: 10
 
   backend:
-    build: .
+    build: ./backend
     container_name: autocare-backend
     restart: unless-stopped
     depends_on:
