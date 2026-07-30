@@ -27,11 +27,21 @@ services:
         condition: service_healthy
     environment:
       DB_HOST: mysql
+      DB_PORT: 3306
       DB_USER: luiz
       DB_PASSWORD: admin
       CORS_ORIGINS: http://localhost:4200
     ports:
       - "8080:8080"
+
+  frontend:
+    build: ./frontend
+    container_name: autocare-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
 
 volumes:
   mysql_data:

@@ -49,3 +49,19 @@ Planned improvements include:
 - **MySQL**
 - **Lombok**
 - **Postman** (for API testing)
+
+---
+
+## Docker
+
+The project can be started with Docker Compose from the repository root:
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+- Frontend: http://localhost:4200
+- Backend: http://localhost:8080/api
+- MySQL: localhost:3307
