@@ -44,11 +44,12 @@ Planned improvements include:
 ## Technology Stack
 
 - **Java 17**
+- **Angular**
+- **TypeScript**
 - **Spring Boot 3**
 - **Spring Data JPA / Hibernate**
 - **MySQL**
-- **Lombok**
-- **Postman** (for API testing)
+- **Docker**
 
 ---
 
