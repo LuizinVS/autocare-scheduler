@@ -19,6 +19,10 @@ public class Vehicle {
     private String model;
     private String brand;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private VehicleSize size;
+
     @Column(name = "license_plate", unique = true)
     private String licensePlate;
 

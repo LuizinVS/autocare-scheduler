@@ -18,8 +18,6 @@ public class ServiceType {
 
     private String name;
 
-    private Double price;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 }

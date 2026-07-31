@@ -7,10 +7,12 @@ import com.luiz.autocare.autocare_scheduler.model.Appointment;
 import com.luiz.autocare.autocare_scheduler.model.AppointmentStatus;
 import com.luiz.autocare.autocare_scheduler.model.Client;
 import com.luiz.autocare.autocare_scheduler.model.ServiceType;
+import com.luiz.autocare.autocare_scheduler.model.ServicePrice;
 import com.luiz.autocare.autocare_scheduler.model.Vehicle;
 import com.luiz.autocare.autocare_scheduler.repository.AppointmentRepository;
 import com.luiz.autocare.autocare_scheduler.repository.ClientRepository;
 import com.luiz.autocare.autocare_scheduler.repository.ServiceTypeRepository;
+import com.luiz.autocare.autocare_scheduler.repository.ServicePriceRepository;
 import com.luiz.autocare.autocare_scheduler.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
@@ -31,16 +33,19 @@ public class AppointmentService {
     private final ClientRepository clientRepository;
     private final VehicleRepository vehicleRepository;
     private final ServiceTypeRepository serviceTypeRepository;
+    private final ServicePriceRepository servicePriceRepository;
 
     public AppointmentService(
             AppointmentRepository appointmentRepository,
             ClientRepository clientRepository,
             VehicleRepository vehicleRepository,
-            ServiceTypeRepository serviceTypeRepository) {
+            ServiceTypeRepository serviceTypeRepository,
+            ServicePriceRepository servicePriceRepository) {
         this.appointmentRepository = appointmentRepository;
         this.clientRepository = clientRepository;
         this.vehicleRepository = vehicleRepository;
         this.serviceTypeRepository = serviceTypeRepository;
+        this.servicePriceRepository = servicePriceRepository;
     }
 
     public org.springframework.data.domain.Page<Appointment> findAll(org.springframework.data.domain.Pageable pageable) {
@@ -79,6 +84,7 @@ public class AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
         ServiceType serviceType = serviceTypeRepository.findById(dto.getServiceTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Service type not found"));
+        ServicePrice servicePrice = findServicePrice(serviceType, vehicle);
 
         LocalDateTime start = dto.getScheduledDateTime().minusMinutes(CONFLICT_WINDOW_MINUTES);
         LocalDateTime end = dto.getScheduledDateTime().plusMinutes(CONFLICT_WINDOW_MINUTES);
@@ -91,6 +97,7 @@ public class AppointmentService {
         appointment.setClient(client);
         appointment.setVehicle(vehicle);
         appointment.setServiceType(serviceType);
+        appointment.setPriceAtBooking(servicePrice.getPrice());
         appointment.setScheduledDateTime(dto.getScheduledDateTime());
 
         return appointmentRepository.save(appointment);
@@ -106,6 +113,7 @@ public class AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Vehicle not found"));
         ServiceType serviceType = serviceTypeRepository.findById(dto.getServiceTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Service type not found"));
+        ServicePrice servicePrice = findServicePrice(serviceType, vehicle);
 
         LocalDateTime start = dto.getScheduledDateTime().minusMinutes(CONFLICT_WINDOW_MINUTES);
         LocalDateTime end = dto.getScheduledDateTime().plusMinutes(CONFLICT_WINDOW_MINUTES);
@@ -119,9 +127,17 @@ public class AppointmentService {
         appointment.setClient(client);
         appointment.setVehicle(vehicle);
         appointment.setServiceType(serviceType);
+        appointment.setPriceAtBooking(servicePrice.getPrice());
         appointment.setScheduledDateTime(dto.getScheduledDateTime());
 
         return appointmentRepository.save(appointment);
+    }
+
+    private ServicePrice findServicePrice(ServiceType serviceType, Vehicle vehicle) {
+        return servicePriceRepository
+                .findByServiceTypeIdAndVehicleSize(serviceType.getId(), vehicle.getSize())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No price configured for this service and vehicle size"));
     }
 
     public Appointment updateStatus(Long id, AppointmentStatus newStatus) {

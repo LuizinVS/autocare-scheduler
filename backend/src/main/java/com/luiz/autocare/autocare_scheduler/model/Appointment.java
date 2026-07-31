@@ -28,6 +28,9 @@ public class Appointment {
     @JoinColumn(name = "service_type_id", nullable = false)
     private ServiceType serviceType;
 
+    @Column(name = "price_at_booking", nullable = false)
+    private Double priceAtBooking;
+
     @Column(name = "scheduled_datetime", nullable = false)
     private LocalDateTime scheduledDateTime;
 

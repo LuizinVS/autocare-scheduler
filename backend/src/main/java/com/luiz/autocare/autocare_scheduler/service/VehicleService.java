@@ -40,6 +40,7 @@ public class VehicleService {
         vehicle.setModel(dto.getModel());
         vehicle.setBrand(dto.getBrand());
         vehicle.setLicensePlate(dto.getLicensePlate());
+        vehicle.setSize(dto.getSize());
         vehicle.setClient(client);
 
         return vehicleRepository.save(vehicle);
