@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
     List<Vehicle> findByClientId(Long clientId);
+    boolean existsByIdAndClientId(Long id, Long clientId);
 }

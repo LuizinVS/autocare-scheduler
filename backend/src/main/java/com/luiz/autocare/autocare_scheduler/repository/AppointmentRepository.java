@@ -13,4 +13,5 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long>, JpaSpecificationExecutor<Appointment> {
     List<Appointment> findByScheduledDateTimeBetweenAndStatusNot(LocalDateTime start, LocalDateTime end, AppointmentStatus status);
     List<Appointment> findByClientId(Long clientId);
+    boolean existsByIdAndClientId(Long id, Long clientId);
 }

@@ -175,13 +175,9 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
               </label>
             </div>
 
-            <div class="space-y-2 text-sm text-rose-700">
-              @if (showError('clientId')) { <p>{{ showError('clientId') }}</p> }
-              @if (showError('vehicleId')) { <p>{{ showError('vehicleId') }}</p> }
-              @if (showError('serviceTypeId')) { <p>{{ showError('serviceTypeId') }}</p> }
-              @if (showError('scheduledDate')) { <p>{{ showError('scheduledDate') }}</p> }
-              @if (showError('scheduledTime')) { <p>{{ showError('scheduledTime') }}</p> }
-            </div>
+            @if (form.invalid && formSubmitted()) {
+              <p class="text-sm text-rose-700">Preencha todos os campos obrigatórios.</p>
+            }
 
             <button type="submit" class="w-full rounded-full bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-700" [disabled]="submitting()">
               {{ submitting() ? 'Salvando...' : (editingId() ? 'Atualizar agendamento' : 'Criar agendamento') }}
@@ -215,6 +211,7 @@ export class AppointmentsPageComponent implements OnInit {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly submitting = signal(false);
+  protected readonly formSubmitted = signal(false);
   protected readonly editingId = signal<number | null>(null);
   protected readonly filtersForm = this.fb.group({
     status: this.fb.control<AppointmentStatus | null>(null),
@@ -234,6 +231,7 @@ export class AppointmentsPageComponent implements OnInit {
     this.clientService.list(0, 200).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((page) => this.clients.set(page.content));
     this.serviceTypeService.list(0, 200).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((page) => this.serviceTypes.set(page.content));
     this.loadPage(0);
+    this.loadAvailability(this.form.controls.scheduledDate.value);
 
     this.form.controls.clientId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((clientId) => {
       this.form.controls.vehicleId.setValue(null);
@@ -277,6 +275,7 @@ export class AppointmentsPageComponent implements OnInit {
   }
 
   protected edit(appointment: Appointment): void {
+    this.formSubmitted.set(false);
     this.editingId.set(appointment.id);
     const date = toDateInputValue(appointment.scheduledDateTime);
     const time = toTimeInputValue(appointment.scheduledDateTime);
@@ -297,6 +296,7 @@ export class AppointmentsPageComponent implements OnInit {
   }
 
   protected resetForm(): void {
+    this.formSubmitted.set(false);
     this.editingId.set(null);
     this.form.reset({ clientId: null, vehicleId: null, serviceTypeId: null, scheduledDate: todayIsoDate(), scheduledTime: null });
     this.availableSlots.set([]);
@@ -304,6 +304,8 @@ export class AppointmentsPageComponent implements OnInit {
   }
 
   protected submit(): void {
+    this.formSubmitted.set(true);
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -360,15 +362,6 @@ export class AppointmentsPageComponent implements OnInit {
 
   protected label(status: AppointmentStatus): string {
     return appointmentStatusLabels[status];
-  }
-
-  protected showError(controlName: 'clientId' | 'vehicleId' | 'serviceTypeId' | 'scheduledDate' | 'scheduledTime'): string | null {
-    const control = this.form.controls[controlName];
-    if (!control.touched || !control.errors) {
-      return null;
-    }
-
-    return 'Campo obrigatório.';
   }
 
   protected formatDateTime(value: string): string {

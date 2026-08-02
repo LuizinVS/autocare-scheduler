@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,17 +25,19 @@ public class ServiceTypeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
     public ResponseEntity<Page<ServiceTypeResponseDTO>> findAll(@PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(service.findAll(pageable));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
     public ResponseEntity<ServiceTypeResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
-    // TODO: restrict to ADMIN role once authentication is implemented.
     @PutMapping("/{serviceTypeId}/prices/{vehicleSize}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ServicePriceResponseDTO> updatePrice(
             @PathVariable Long serviceTypeId,
             @PathVariable VehicleSize vehicleSize,

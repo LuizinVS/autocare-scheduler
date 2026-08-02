@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,28 +29,33 @@ public class ClientController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Page<Client>> findAll(@PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(clientService.findAll(pageable));
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or @authorizationService.isOwnClient(#id)")
     public ResponseEntity<Client> findById(@PathVariable Long id) {
         return ResponseEntity.ok(clientService.findById(id));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Client> createClient(@Valid @RequestBody ClientDTO dto) {
         Client saved = clientService.createClient(dto);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}/vehicles")
+    @PreAuthorize("hasRole('ADMIN') or @authorizationService.isOwnClient(#id)")
     public ResponseEntity<List<com.luiz.autocare.autocare_scheduler.model.Vehicle>> findVehiclesByClient(@PathVariable Long id) {
         List<com.luiz.autocare.autocare_scheduler.model.Vehicle> vehicles = vehicleService.findByClientId(id);
         return ResponseEntity.ok(vehicles);
     }
 
     @GetMapping("/{id}/appointments")
+    @PreAuthorize("hasRole('ADMIN') or @authorizationService.isOwnClient(#id)")
     public ResponseEntity<List<com.luiz.autocare.autocare_scheduler.model.Appointment>> findAppointmentsByClient(@PathVariable Long id) {
         List<com.luiz.autocare.autocare_scheduler.model.Appointment> appointments = appointmentService.findByClientId(id);
         return ResponseEntity.ok(appointments);
