@@ -11,6 +11,8 @@ import com.luiz.autocare.autocare_scheduler.repository.ClientRepository;
 import com.luiz.autocare.autocare_scheduler.repository.UserRepository;
 import com.luiz.autocare.autocare_scheduler.security.JwtService;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.util.Locale;
 @Service
 public class AuthService {
     private static final String INVALID_CREDENTIALS = "Invalid email or password";
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
@@ -65,9 +68,15 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByEmailIgnoreCase(normalizeEmail(request.getEmail()))
-                .orElseThrow(() -> new BadCredentialsException(INVALID_CREDENTIALS));
+        String email = normalizeEmail(request.getEmail());
+        logger.info("Login request reached authentication service for email {}", email);
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> {
+                    logger.warn("Login rejected for email {}", email);
+                    return new BadCredentialsException(INVALID_CREDENTIALS);
+                });
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            logger.warn("Login rejected for email {}", email);
             throw new BadCredentialsException(INVALID_CREDENTIALS);
         }
 
@@ -77,6 +86,7 @@ public class AuthService {
                     .map(Client::getId)
                     .orElseThrow(() -> new BadCredentialsException(INVALID_CREDENTIALS));
         }
+        logger.info("Login succeeded for user id {} with role {}", user.getId(), user.getRole());
         return new AuthResponse(jwtService.generateToken(user, clientId));
     }
 

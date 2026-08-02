@@ -51,13 +51,13 @@ class AuthSecurityIntegrationTest {
     void loginReturnsJwtForCorrectCredentialsAnd401ForIncorrectCredentials() throws Exception {
         registerAndGetToken("login@example.com");
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/auth/login").contextPath("/api")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of("email", "login@example.com", "password", "password123"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty());
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/auth/login").contextPath("/api")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of("email", "login@example.com", "password", "wrong-password"))))
                 .andExpect(status().isUnauthorized())
@@ -66,7 +66,7 @@ class AuthSecurityIntegrationTest {
 
     @Test
     void protectedEndpointReturns401WithoutToken() throws Exception {
-        mockMvc.perform(get("/clients"))
+        mockMvc.perform(get("/api/clients").contextPath("/api"))
                 .andExpect(status().isUnauthorized());
     }
 
@@ -76,17 +76,17 @@ class AuthSecurityIntegrationTest {
         var user = userRepository.findByEmailIgnoreCase("owner@example.com").orElseThrow();
         Long clientId = clientRepository.findByUserId(user.getId()).orElseThrow().getId();
 
-        mockMvc.perform(get("/clients").header("Authorization", "Bearer " + token))
+        mockMvc.perform(get("/api/clients").contextPath("/api").header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/clients/{id}", clientId).header("Authorization", "Bearer " + token))
+        mockMvc.perform(get("/api/clients/{id}", clientId).contextPath("/api").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(clientId))
                 .andExpect(jsonPath("$.email").value("owner@example.com"));
     }
 
     private String registerAndGetToken(String email) throws Exception {
-        String response = mockMvc.perform(post("/auth/register")
+        String response = mockMvc.perform(post("/api/auth/register").contextPath("/api")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json(Map.of(
                                 "name", "Test Client",

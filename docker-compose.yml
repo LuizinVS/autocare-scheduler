@@ -31,6 +31,8 @@ services:
       DB_USER: luiz
       DB_PASSWORD: admin
       CORS_ORIGINS: http://localhost:4200
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@autocare.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-before-deploying}
     ports:
       - "8080:8080"
 
