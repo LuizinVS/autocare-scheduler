@@ -4,8 +4,15 @@ import { tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-interface LoginResponse {
+interface AuthResponse {
   token: string;
+}
+
+export interface RegisterRequest {
+  name: string;
+  phone: string;
+  email: string;
+  password: string;
 }
 
 interface AuthClaims {
@@ -31,7 +38,13 @@ export class AuthService {
 
   login(email: string, password: string) {
     return this.http
-      .post<LoginResponse>(`${environment.apiUrl}/auth/login`, { email, password })
+      .post<AuthResponse>(`${environment.apiUrl}/auth/login`, { email, password })
+      .pipe(tap(({ token }) => this.setSession(token)));
+  }
+
+  register(request: RegisterRequest) {
+    return this.http
+      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, request)
       .pipe(tap(({ token }) => this.setSession(token)));
   }
 
