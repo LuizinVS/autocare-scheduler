@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiPage } from '../../shared/models/api-page.model';
 import { ServiceType } from '../../shared/models/service-type.model';
-import { ServiceTypeDTO } from '../../shared/models/service-type-dto.model';
+import { ServicePrice } from '../../shared/models/service-price.model';
+import { VehicleSize } from '../../shared/models/vehicle-size.model';
 import { buildHttpParams } from '../../shared/utils/http-params';
 
 @Injectable({
@@ -24,15 +25,7 @@ export class ServiceTypeService {
     return this.http.get<ServiceType>(`${this.apiUrl}/${id}`);
   }
 
-  create(serviceType: ServiceTypeDTO): Observable<ServiceType> {
-    return this.http.post<ServiceType>(this.apiUrl, serviceType);
-  }
-
-  update(id: number, serviceType: ServiceTypeDTO): Observable<ServiceType> {
-    return this.http.put<ServiceType>(`${this.apiUrl}/${id}`, serviceType);
-  }
-
-  delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  updatePrice(serviceTypeId: number, vehicleSize: VehicleSize, price: number): Observable<ServicePrice> {
+    return this.http.put<ServicePrice>(`${this.apiUrl}/${serviceTypeId}/prices/${vehicleSize}`, { price });
   }
 }

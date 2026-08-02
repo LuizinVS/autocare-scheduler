@@ -1,6 +1,8 @@
+import { ServicePrice } from './service-price.model';
+
 export interface ServiceType {
   id: number;
   name: string;
-  price: number;
+  prices: ServicePrice[];
   createdAt: string;
 }

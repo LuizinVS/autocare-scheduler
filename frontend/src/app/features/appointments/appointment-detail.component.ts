@@ -21,7 +21,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
         <p>{{ error() }}</p><button class="mt-3 font-semibold underline" type="button" (click)="load()">Tentar novamente</button>
       </div>
     } @else if (appointment(); as item) {
-      <section class="mt-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section class="mt-4 rounded-2xl bg-white p-6 shadow-sm">
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div><p class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-700">Agendamento #{{ item.id }}</p>
             <h2 class="mt-2 text-3xl font-black text-slate-900">{{ item.client.name }}</h2></div>
@@ -30,6 +30,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
         <dl class="mt-6 grid gap-5 sm:grid-cols-2">
           <div><dt class="text-sm text-slate-500">Data e horário</dt><dd class="font-semibold">{{ format(item.scheduledDateTime) }}</dd></div>
           <div><dt class="text-sm text-slate-500">Serviço</dt><dd class="font-semibold">{{ item.serviceType.name }}</dd></div>
+          <div><dt class="text-sm text-slate-500">Valor do agendamento</dt><dd class="font-semibold">{{ currency(item.priceAtBooking) }}</dd></div>
           <div><dt class="text-sm text-slate-500">Veículo</dt><dd><a class="font-semibold text-sky-700" [routerLink]="['/vehicles', item.vehicle.id]">{{ item.vehicle.brand }} {{ item.vehicle.model }} · {{ item.vehicle.licensePlate }}</a></dd></div>
           <div><dt class="text-sm text-slate-500">Cliente</dt><dd><a class="font-semibold text-sky-700" [routerLink]="['/clients', item.client.id]">{{ item.client.name }}</a></dd></div>
           <div><dt class="text-sm text-slate-500">Criado em</dt><dd class="font-semibold">{{ format(item.createdAt) }}</dd></div>
@@ -55,4 +56,5 @@ export class AppointmentDetailComponent implements OnInit {
   }
   protected format(value: string): string { return formatLocalDateTime(value); }
   protected statusLabel(status: Appointment['status']): string { return appointmentStatusLabels[status]; }
+  protected currency(value: number): string { return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value); }
 }

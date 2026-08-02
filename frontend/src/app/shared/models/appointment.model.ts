@@ -8,6 +8,7 @@ export interface Appointment {
   client: Client;
   vehicle: Vehicle;
   serviceType: ServiceType;
+  priceAtBooking: number;
   scheduledDateTime: string;
   status: AppointmentStatus;
   createdAt: string;

@@ -29,7 +29,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
         </div>
 
         <div class="grid gap-6 xl:grid-cols-2">
-          <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <article class="rounded-2xl bg-white p-6 shadow-sm">
             <h3 class="text-lg font-bold text-slate-900">Veículos</h3>
             @if (vehicles().length === 0) {
               <p class="mt-4 text-sm text-slate-500">Nenhum veículo vinculado.</p>
@@ -45,7 +45,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
             }
           </article>
 
-          <article class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <article class="rounded-2xl bg-white p-6 shadow-sm">
             <h3 class="text-lg font-bold text-slate-900">Histórico de agendamentos</h3>
             @if (appointments().length === 0) {
               <p class="mt-4 text-sm text-slate-500">Nenhum agendamento encontrado.</p>

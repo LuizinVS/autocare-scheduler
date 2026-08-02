@@ -11,6 +11,7 @@ import { ApiPage } from '../../shared/models/api-page.model';
 import { Client } from '../../shared/models/client.model';
 import { Vehicle } from '../../shared/models/vehicle.model';
 import { VehicleDTO } from '../../shared/models/vehicle-dto.model';
+import { VehicleSize, vehicleSizeLabels, vehicleSizes } from '../../shared/models/vehicle-size.model';
 
 @Component({
   standalone: true,
@@ -18,7 +19,7 @@ import { VehicleDTO } from '../../shared/models/vehicle-dto.model';
   imports: [ReactiveFormsModule, RouterLink],
   template: `
     <section class="grid gap-6 xl:grid-cols-[1.25fr_0.95fr]">
-      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between gap-4">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.32em] text-sky-700">Veículos</p>
@@ -34,13 +35,14 @@ import { VehicleDTO } from '../../shared/models/vehicle-dto.model';
         } @else if (page().content.length === 0) {
           <p class="mt-6 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">Nenhum veículo encontrado.</p>
         } @else {
-          <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
+          <div class="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
               <thead class="bg-slate-50 text-slate-500">
                 <tr>
                   <th class="px-4 py-3 font-semibold">Veículo</th>
                   <th class="px-4 py-3 font-semibold">Cliente</th>
                   <th class="px-4 py-3 font-semibold">Placa</th>
+                  <th class="px-4 py-3 font-semibold">Porte</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 bg-white">
@@ -49,6 +51,7 @@ import { VehicleDTO } from '../../shared/models/vehicle-dto.model';
                     <td class="px-4 py-3 font-medium"><a class="text-sky-700" [routerLink]="[vehicle.id]">{{ vehicle.brand }} {{ vehicle.model }}</a></td>
                     <td class="px-4 py-3 text-slate-600">{{ vehicle.client.name }}</td>
                     <td class="px-4 py-3 text-slate-600">{{ vehicle.licensePlate }}</td>
+                    <td class="px-4 py-3 text-slate-600">{{ sizeLabel(vehicle.size) }}</td>
                   </tr>
                 }
               </tbody>
@@ -65,7 +68,7 @@ import { VehicleDTO } from '../../shared/models/vehicle-dto.model';
         }
       </div>
 
-      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl bg-white p-6 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900">Novo veículo</h3>
 
         <form class="mt-5 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
@@ -81,15 +84,25 @@ import { VehicleDTO } from '../../shared/models/vehicle-dto.model';
           <label class="block"><span class="mb-1 block text-sm font-semibold text-slate-700">Marca</span><input class="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none ring-sky-300 focus:ring-4" formControlName="brand" /></label>
           <label class="block"><span class="mb-1 block text-sm font-semibold text-slate-700">Modelo</span><input class="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none ring-sky-300 focus:ring-4" formControlName="model" /></label>
           <label class="block"><span class="mb-1 block text-sm font-semibold text-slate-700">Placa</span><input class="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none ring-sky-300 focus:ring-4" formControlName="licensePlate" /></label>
+          <label class="block">
+            <span class="mb-1 block text-sm font-semibold text-slate-700">Porte do veículo</span>
+            <select class="w-full rounded-2xl border border-slate-300 px-4 py-3 outline-none ring-sky-300 focus:ring-4" formControlName="size">
+              <option [ngValue]="null">Selecione</option>
+              @for (size of sizes; track size) {
+                <option [ngValue]="size">{{ sizeLabel(size) }}</option>
+              }
+            </select>
+          </label>
 
           <div class="space-y-2 text-sm text-rose-700">
             @if (showError('clientId')) { <p>{{ showError('clientId') }}</p> }
             @if (showError('brand')) { <p>{{ showError('brand') }}</p> }
             @if (showError('model')) { <p>{{ showError('model') }}</p> }
             @if (showError('licensePlate')) { <p>{{ showError('licensePlate') }}</p> }
+            @if (showError('size')) { <p>{{ showError('size') }}</p> }
           </div>
 
-          <button type="submit" class="w-full rounded-2xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-700" [disabled]="submitting()">
+          <button type="submit" class="w-full rounded-full bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-700" [disabled]="submitting()">
             {{ submitting() ? 'Salvando...' : 'Cadastrar veículo' }}
           </button>
         </form>
@@ -109,11 +122,13 @@ export class VehiclesPageComponent implements OnInit {
   protected readonly loading = signal(false);
   protected readonly error = signal<string | null>(null);
   protected readonly submitting = signal(false);
+  protected readonly sizes = vehicleSizes;
   protected readonly form = this.fb.group({
     clientId: this.fb.control<number | null>(null, Validators.required),
     brand: this.fb.nonNullable.control('', Validators.required),
     model: this.fb.nonNullable.control('', Validators.required),
-    licensePlate: this.fb.nonNullable.control('', Validators.required)
+    licensePlate: this.fb.nonNullable.control('', Validators.required),
+    size: this.fb.control<VehicleSize | null>(null, Validators.required)
   });
 
   ngOnInit(): void {
@@ -141,7 +156,8 @@ export class VehiclesPageComponent implements OnInit {
       clientId: value.clientId as number,
       brand: value.brand,
       model: value.model,
-      licensePlate: value.licensePlate
+      licensePlate: value.licensePlate,
+      size: value.size as VehicleSize
     };
 
     this.submitting.set(true);
@@ -155,12 +171,16 @@ export class VehiclesPageComponent implements OnInit {
       });
   }
 
-  protected showError(controlName: 'clientId' | 'brand' | 'model' | 'licensePlate'): string | null {
+  protected showError(controlName: 'clientId' | 'brand' | 'model' | 'licensePlate' | 'size'): string | null {
     const control = this.form.controls[controlName];
     if (!control.touched || !control.errors) {
       return null;
     }
 
     return 'Campo obrigatório.';
+  }
+
+  protected sizeLabel(size: VehicleSize): string {
+    return vehicleSizeLabels[size];
   }
 }

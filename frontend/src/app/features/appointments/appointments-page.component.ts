@@ -24,7 +24,7 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
   imports: [ReactiveFormsModule, RouterLink],
   template: `
     <section class="space-y-6">
-      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl bg-white p-6 shadow-sm">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.32em] text-sky-700">Agendamentos</p>
@@ -57,14 +57,14 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
             </select>
           </label>
           <div class="flex items-end gap-3">
-            <button type="submit" class="w-full rounded-2xl bg-slate-900 px-4 py-3 font-semibold text-white">Filtrar</button>
-            <button type="button" class="w-full rounded-2xl border border-slate-200 px-4 py-3 font-semibold" (click)="resetFilters()">Limpar</button>
+            <button type="submit" class="w-full rounded-full bg-slate-900 px-4 py-3 font-semibold text-white">Filtrar</button>
+            <button type="button" class="w-full rounded-full border border-slate-200 px-4 py-3 font-semibold" (click)="resetFilters()">Limpar</button>
           </div>
         </form>
       </div>
 
       <div class="grid gap-6 xl:grid-cols-[1.25fr_0.95fr]">
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl bg-white p-6 shadow-sm">
           <div class="flex items-center justify-between gap-4">
             <h3 class="text-lg font-bold text-slate-900">Listagem</h3>
             <span class="text-sm text-slate-500">{{ page().totalElements }} registro(s)</span>
@@ -79,7 +79,7 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
           } @else {
             <div class="mt-6 space-y-3">
               @for (appointment of page().content; track appointment.id) {
-                <article class="rounded-3xl border border-slate-200 p-5">
+                <article class="rounded-2xl bg-slate-50 p-5 shadow-sm">
                   <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <div class="flex flex-wrap items-center gap-2">
@@ -87,6 +87,7 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
                         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em] text-slate-700">{{ label(appointment.status) }}</span>
                       </div>
                       <p class="mt-1 text-sm text-slate-500">{{ formatDateTime(appointment.scheduledDateTime) }} · {{ appointment.vehicle.brand }} {{ appointment.vehicle.model }} · {{ appointment.serviceType.name }}</p>
+                      <p class="mt-1 text-sm font-semibold text-slate-700">{{ currency(appointment.priceAtBooking) }}</p>
                     </div>
                     <div class="flex flex-wrap gap-2">
                       <button type="button" class="rounded-full border border-slate-200 px-3 py-1.5 text-sm font-semibold" (click)="edit(appointment)">Editar</button>
@@ -116,7 +117,7 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
           }
         </div>
 
-        <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="rounded-2xl bg-white p-6 shadow-sm">
           <div class="flex items-center justify-between gap-3">
             <h3 class="text-lg font-bold text-slate-900">{{ editingId() ? 'Editar agendamento' : 'Novo agendamento' }}</h3>
             @if (editingId()) {
@@ -152,6 +153,12 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
                 }
               </select>
             </label>
+            @if (calculatedPrice() !== null) {
+              <div class="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+                <span class="font-semibold">Preço previsto:</span> {{ currency(calculatedPrice()!) }}
+                <p class="mt-1 text-xs text-sky-700">O valor definitivo será calculado pelo sistema ao salvar.</p>
+              </div>
+            }
             <div class="grid gap-4 sm:grid-cols-2">
               <label class="block">
                 <span class="mb-1 block text-sm font-semibold text-slate-700">Data</span>
@@ -176,7 +183,7 @@ import { composeLocalDateTime, formatLocalDateTime, toDateInputValue, toTimeInpu
               @if (showError('scheduledTime')) { <p>{{ showError('scheduledTime') }}</p> }
             </div>
 
-            <button type="submit" class="w-full rounded-2xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-700" [disabled]="submitting()">
+            <button type="submit" class="w-full rounded-full bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-700" [disabled]="submitting()">
               {{ submitting() ? 'Salvando...' : (editingId() ? 'Atualizar agendamento' : 'Criar agendamento') }}
             </button>
           </form>
@@ -366,5 +373,18 @@ export class AppointmentsPageComponent implements OnInit {
 
   protected formatDateTime(value: string): string {
     return formatLocalDateTime(value);
+  }
+
+  protected calculatedPrice(): number | null {
+    const vehicleId = this.form.controls.vehicleId.value;
+    const serviceTypeId = this.form.controls.serviceTypeId.value;
+    const vehicle = this.vehicles().find((item) => item.id === vehicleId);
+    const serviceType = this.serviceTypes().find((item) => item.id === serviceTypeId);
+    if (!vehicle || !serviceType) return null;
+    return serviceType.prices.find((price) => price.vehicleSize === vehicle.size)?.price ?? null;
+  }
+
+  protected currency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
   }
 }

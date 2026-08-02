@@ -17,7 +17,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
   imports: [ReactiveFormsModule, RouterLink],
   template: `
     <section class="grid gap-6 xl:grid-cols-[1.25fr_0.95fr]">
-      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between gap-4">
           <div>
             <p class="text-xs font-semibold uppercase tracking-[0.32em] text-sky-700">Clientes</p>
@@ -33,7 +33,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
         } @else if (page().content.length === 0) {
           <p class="mt-6 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">Nenhum cliente encontrado.</p>
         } @else {
-          <div class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
+          <div class="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm">
             <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
               <thead class="bg-slate-50 text-slate-500">
                 <tr>
@@ -69,7 +69,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
         }
       </div>
 
-      <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div class="rounded-2xl bg-white p-6 shadow-sm">
         <h3 class="text-lg font-bold text-slate-900">Novo cliente</h3>
 
         <form class="mt-5 space-y-4" [formGroup]="form" (ngSubmit)="submit()">
@@ -92,7 +92,7 @@ import { formatLocalDateTime } from '../../shared/utils/date-time';
             @if (showError('email')) { <p>{{ showError('email') }}</p> }
           </div>
 
-          <button type="submit" class="w-full rounded-2xl bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-700" [disabled]="submitting()">
+          <button type="submit" class="w-full rounded-full bg-slate-900 px-4 py-3 font-semibold text-white transition hover:bg-slate-700" [disabled]="submitting()">
             {{ submitting() ? 'Salvando...' : 'Cadastrar cliente' }}
           </button>
         </form>
