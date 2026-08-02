@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
+import { PublicHeaderComponent } from '../../shared/components/public-header/public-header.component';
 
 function passwordsMatch(control: AbstractControl): ValidationErrors | null {
   return control.get('password')?.value === control.get('passwordConfirmation')?.value
@@ -15,23 +16,13 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
 @Component({
   standalone: true,
   selector: 'app-register-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [PublicHeaderComponent, ReactiveFormsModule, RouterLink],
   host: { class: 'fixed inset-0 z-50 block overflow-y-auto bg-black text-white' },
   template: `
-    <div class="flex min-h-svh flex-col bg-black px-6 sm:px-10 lg:px-16">
-      <header class="mx-auto flex w-full max-w-7xl items-center justify-between py-7 sm:py-9">
-        <a routerLink="/home" class="text-xl font-black uppercase tracking-[0.18em] text-white sm:text-2xl">Elite Car</a>
+    <div class="flex min-h-svh flex-col bg-black">
+      <app-public-header />
 
-        <nav aria-label="Navegação institucional" class="hidden items-center gap-8 text-sm text-white/60 md:flex">
-          <a routerLink="/home" fragment="sobre" class="transition hover:text-white">Sobre</a>
-          <a routerLink="/home" fragment="servicos" class="transition hover:text-white">Serviços</a>
-          <a routerLink="/home" fragment="contato" class="transition hover:text-white">Contato</a>
-        </nav>
-
-        <a routerLink="/login" class="rounded-full border border-white/40 px-5 py-2 text-sm font-semibold transition hover:border-white hover:bg-white hover:text-black">Entrar</a>
-      </header>
-
-      <main class="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center py-12 sm:py-16">
+      <main class="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-6 py-12 sm:px-10 sm:py-16 lg:px-16">
         <section class="w-full max-w-md text-center">
           <p class="text-xs font-semibold uppercase tracking-[0.38em] text-white/45">Comece agora</p>
           <h1 class="mt-6 text-5xl font-black tracking-[-0.05em] text-white sm:text-6xl">Crie sua conta</h1>
@@ -94,7 +85,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
         </section>
       </main>
 
-      <footer class="py-7 text-center text-xs text-white/25">© Elite Car</footer>
+      <footer class="px-6 py-7 text-center text-xs text-white/25 sm:px-10 lg:px-16">© Elite Car</footer>
     </div>
   `
 })

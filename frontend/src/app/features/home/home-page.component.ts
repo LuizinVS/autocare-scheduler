@@ -1,29 +1,19 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+import { PublicHeaderComponent } from '../../shared/components/public-header/public-header.component';
+
 @Component({
   standalone: true,
   selector: 'app-home-page',
-  imports: [RouterLink],
+  imports: [PublicHeaderComponent, RouterLink],
   host: { class: 'fixed inset-0 z-50 block overflow-y-auto bg-black text-white' },
   template: `
     <div class="flex min-h-svh flex-col bg-black">
-      <header class="flex-none bg-black px-6 sm:px-10 lg:px-16">
-        <div class="mx-auto flex w-full max-w-7xl items-center justify-between py-7 sm:py-9">
-        <a routerLink="/home" class="text-xl font-black uppercase tracking-[0.18em] text-white sm:text-2xl">Elite Car</a>
-
-        <nav aria-label="Navegação institucional" class="hidden items-center gap-8 text-sm text-white/60 md:flex">
-          <a href="#sobre" class="transition hover:text-white">Sobre</a>
-          <a href="#servicos" class="transition hover:text-white">Serviços</a>
-          <a href="#contato" class="transition hover:text-white">Contato</a>
-        </nav>
-
-        <a routerLink="/login" class="rounded-full border border-white/40 px-5 py-2 text-sm font-semibold transition hover:border-white hover:bg-white hover:text-black">Entrar</a>
-        </div>
-      </header>
+      <app-public-header />
 
       <div
-        class="flex flex-1 flex-col bg-cover bg-center px-6 sm:px-10 lg:px-16"
+        class="flex flex-1 flex-col bg-cover bg-center px-4 sm:px-6 lg:px-10"
         style="background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9)), url('/images/home-background.jpg')"
       >
       <main class="mx-auto flex w-full max-w-7xl flex-1 items-center py-16 sm:py-24">

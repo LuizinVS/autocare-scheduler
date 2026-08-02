@@ -5,37 +5,23 @@ import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
+import { PublicHeaderComponent } from '../../shared/components/public-header/public-header.component';
 
 @Component({
   standalone: true,
   selector: 'app-login-page',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [PublicHeaderComponent, ReactiveFormsModule, RouterLink],
   host: { class: 'fixed inset-0 z-50 block overflow-y-auto bg-black text-white' },
   template: `
-    <div class="flex min-h-svh flex-col bg-black px-6 sm:px-10 lg:px-16">
-      <header class="mx-auto flex w-full max-w-7xl items-center justify-between py-7 sm:py-9">
-        <a routerLink="/login" class="text-xl font-black uppercase tracking-[0.18em] text-white sm:text-2xl">
-          Elite Car
-        </a>
+    <div class="flex min-h-svh flex-col bg-black">
+      <app-public-header />
 
-        <nav aria-label="Navegação institucional" class="hidden items-center gap-8 text-sm text-white/60 md:flex">
-          <a href="#" class="transition hover:text-white">Sobre</a>
-          <a href="#" class="transition hover:text-white">Serviços</a>
-          <a href="#" class="transition hover:text-white">Contato</a>
-        </nav>
-
-        <a
-          routerLink="/login"
-          class="rounded-full border border-white/40 px-5 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-black"
-        >Entrar</a>
-      </header>
-
-      <main class="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center py-12 sm:py-16">
+      <main class="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-6 py-12 sm:px-10 sm:py-16 lg:px-16">
         <section class="w-full max-w-md text-center">
           <p class="text-xs font-semibold uppercase tracking-[0.38em] text-white/45">Área exclusiva</p>
           <h1 class="mt-6 text-5xl font-black tracking-[-0.05em] text-white sm:text-6xl">Acesse sua conta</h1>
           <p class="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/55 sm:text-base">
-            Entre para gerenciar seus veículos e acompanhar seus agendamentos.
+            Entre para acompanhar seus agendamentos.
           </p>
 
           <form class="mt-10 space-y-5 text-left" [formGroup]="form" (ngSubmit)="submit()">
@@ -89,7 +75,7 @@ import { AuthService } from '../../core/services/auth.service';
         </section>
       </main>
 
-      <footer class="py-7 text-center text-xs text-white/25">© Elite Car</footer>
+      <footer class="px-6 py-7 text-center text-xs text-white/25 sm:px-10 lg:px-16">© Elite Car</footer>
     </div>
   `
 })
