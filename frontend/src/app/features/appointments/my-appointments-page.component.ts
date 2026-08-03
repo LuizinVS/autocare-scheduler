@@ -31,6 +31,19 @@ import { AppointmentFormComponent } from './appointment-form.component';
         </div>
       </div>
 
+      <div class="grid grid-cols-2 gap-3 sm:gap-5" aria-label="Galeria Elite Car">
+        <img
+          src="/images/my-appointments-image.avif"
+          alt="Serviço de estética automotiva da Elite Car"
+          class="aspect-[4/3] h-full w-full rounded-xl object-cover"
+        />
+        <img
+          src="/images/my-appointments-image-2.avif"
+          alt="Veículo cuidado pela equipe Elite Car"
+          class="aspect-[4/3] h-full w-full rounded-xl object-cover"
+        />
+      </div>
+
       @if (clientId() === null) {
         <div class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
           Não foi possível identificar o cliente associado à sua conta.
@@ -75,6 +88,10 @@ import { AppointmentFormComponent } from './appointment-form.component';
           }
         </div>
       }
+
+      <footer class="border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+        © Elite Car · Estética automotiva premium
+      </footer>
     </section>
   `
 })

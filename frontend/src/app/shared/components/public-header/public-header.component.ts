@@ -19,9 +19,9 @@ import { AuthService } from '../../../core/services/auth.service';
             <a href="#contato" class="transition hover:text-white">Contato</a>
           </nav>
 
-          <a routerLink="/login" class="ml-6 rounded-lg border border-white/40 px-5 py-2 text-sm font-semibold transition hover:border-white hover:bg-white hover:text-black">Entrar</a>
+          <a routerLink="/login" class="ml-6 rounded-lg border border-white/40 px-5 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-black">Entrar</a>
         } @else {
-          <a routerLink="/profile" class="ml-auto rounded-lg border border-white/40 px-5 py-2 text-sm font-semibold transition hover:border-white hover:bg-white hover:text-black">Perfil</a>
+          <a routerLink="/profile" class="ml-auto rounded-lg border border-white/40 px-5 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white hover:text-black">Perfil</a>
         }
       </div>
     </header>
