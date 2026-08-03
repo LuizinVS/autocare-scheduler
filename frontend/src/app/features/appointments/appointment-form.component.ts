@@ -1,6 +1,7 @@
 import { Component, DestroyRef, OnInit, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { AppointmentService } from '../../core/services/appointment.service';
@@ -21,7 +22,7 @@ export interface AppointmentSavedEvent {
 @Component({
   standalone: true,
   selector: 'app-appointment-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   template: `
     <div class="rounded-2xl bg-white p-6 shadow-sm">
       <div class="flex items-center justify-between gap-3">
@@ -53,6 +54,14 @@ export interface AppointmentSavedEvent {
             }
           </select>
         </label>
+
+        @if (clientId() !== null && !vehiclesLoading() && vehicles().length === 0) {
+          <div class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <p class="font-semibold">Você ainda não tem um veículo cadastrado.</p>
+            <p class="mt-1">Cadastre um veículo antes de continuar com o agendamento.</p>
+            <a routerLink="/my/vehicles" class="mt-3 inline-flex font-semibold underline underline-offset-4">Cadastrar veículo</a>
+          </div>
+        }
 
         <label class="block">
           <span class="mb-1 block text-sm font-semibold text-slate-700">Tipo de serviço</span>
@@ -115,6 +124,7 @@ export class AppointmentFormComponent implements OnInit {
 
   protected readonly clients = signal<Client[]>([]);
   protected readonly vehicles = signal<Vehicle[]>([]);
+  protected readonly vehiclesLoading = signal(false);
   protected readonly serviceTypes = signal<ServiceType[]>([]);
   protected readonly availableSlots = signal<string[]>([]);
   protected readonly submitting = signal(false);
@@ -212,7 +222,11 @@ export class AppointmentFormComponent implements OnInit {
   }
 
   private loadVehicles(clientId: number, selectedVehicleId?: number): void {
-    this.clientService.getVehicles(clientId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe((vehicles) => {
+    this.vehiclesLoading.set(true);
+    this.clientService.getVehicles(clientId).pipe(
+      finalize(() => this.vehiclesLoading.set(false)),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((vehicles) => {
       this.vehicles.set(vehicles);
       if (selectedVehicleId) this.form.controls.vehicleId.setValue(selectedVehicleId, { emitEvent: false });
     });

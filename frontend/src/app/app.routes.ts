@@ -26,6 +26,7 @@ export const routes: Routes = [
     loadComponent: () => import('./layouts/client-layout.component').then((m) => m.ClientLayoutComponent),
     children: [
       { path: 'my/appointments', loadComponent: () => import('./features/appointments/my-appointments-page.component').then((m) => m.MyAppointmentsPageComponent) },
+      { path: 'my/vehicles', loadComponent: () => import('./features/vehicles/my-vehicles-page.component').then((m) => m.MyVehiclesPageComponent) },
       { path: 'profile', loadComponent: () => import('./features/profile/profile-page.component').then((m) => m.ProfilePageComponent) }
     ]
   },
