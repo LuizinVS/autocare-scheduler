@@ -103,7 +103,7 @@ export class LoginPageComponent {
     this.auth.login(email.trim(), password)
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
-        next: () => this.router.navigateByUrl('/dashboard'),
+        next: () => this.router.navigateByUrl(this.auth.authenticatedHome()),
         error: (error: unknown) => {
           this.error.set(
             error instanceof HttpErrorResponse && error.status === 401

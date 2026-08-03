@@ -31,6 +31,7 @@ services:
       DB_USER: luiz
       DB_PASSWORD: admin
       CORS_ORIGINS: http://localhost:4200
+      JWT_COOKIE_SECURE: ${JWT_COOKIE_SECURE:-false}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@autocare.local}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-before-deploying}
     ports:

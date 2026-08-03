@@ -29,6 +29,11 @@ export const routes: Routes = [
 		loadChildren: () => import('./features/dashboard/dashboard.routes').then((m) => m.routes)
 	},
 	{
+		path: 'profile',
+		canActivate: [authGuard],
+		loadComponent: () => import('./features/profile/profile-page.component').then((m) => m.ProfilePageComponent)
+	},
+	{
 		path: 'clients',
 		canActivate: [authGuard],
 		loadChildren: () => import('./features/clients/clients.routes').then((m) => m.routes)
@@ -47,6 +52,11 @@ export const routes: Routes = [
 		path: 'appointments',
 		canActivate: [authGuard],
 		loadChildren: () => import('./features/appointments/appointments.routes').then((m) => m.routes)
+	},
+	{
+		path: 'my/appointments',
+		canActivate: [authGuard],
+		loadComponent: () => import('./features/appointments/my-appointments-page.component').then((m) => m.MyAppointmentsPageComponent)
 	},
 	{
 		path: '**',

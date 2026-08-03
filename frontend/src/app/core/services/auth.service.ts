@@ -1,11 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { tap } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, switchMap, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
-interface AuthResponse {
-  token: string;
+export type UserRole = 'ADMIN' | 'CLIENT';
+
+interface CurrentUser {
+  email: string;
+  role: UserRole;
+  clientId: number | null;
 }
 
 export interface RegisterRequest {
@@ -15,64 +19,58 @@ export interface RegisterRequest {
   password: string;
 }
 
-interface AuthClaims {
-  userId: number | null;
-  email: string | null;
-  role: string | null;
-  clientId: number | null;
-}
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly tokenState = signal<string | null>(null);
-  private readonly claimsState = signal<AuthClaims | null>(null);
+  private readonly currentUserState = signal<CurrentUser | null>(null);
+  private readonly initialization$ = this.loadCurrentUser().pipe(
+    map(() => undefined),
+    shareReplay({ bufferSize: 1, refCount: false })
+  );
 
-  readonly token = this.tokenState.asReadonly();
-  readonly claims = this.claimsState.asReadonly();
-  readonly isAuthenticated = computed(() => this.tokenState() !== null);
-  readonly userId = computed(() => this.claimsState()?.userId ?? null);
-  readonly email = computed(() => this.claimsState()?.email ?? null);
-  readonly role = computed(() => this.claimsState()?.role ?? null);
-  readonly clientId = computed(() => this.claimsState()?.clientId ?? null);
+  readonly currentUser = this.currentUserState.asReadonly();
+  readonly isAuthenticated = computed(() => this.currentUserState() !== null);
+  readonly email = computed(() => this.currentUserState()?.email ?? null);
+  readonly role = computed(() => this.currentUserState()?.role ?? null);
+  readonly clientId = computed(() => this.currentUserState()?.clientId ?? null);
+  readonly authenticatedHome = computed(() => this.role() === 'CLIENT' ? '/my/appointments' : '/dashboard');
 
-  login(email: string, password: string) {
+  initialize(): Observable<void> {
+    return this.initialization$;
+  }
+
+  login(email: string, password: string): Observable<void> {
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/login`, { email, password })
-      .pipe(tap(({ token }) => this.setSession(token)));
+      .post<void>(`${environment.apiUrl}/auth/login`, { email, password })
+      .pipe(
+        switchMap(() => this.loadCurrentUser()),
+        map(() => undefined)
+      );
   }
 
-  register(request: RegisterRequest) {
+  register(request: RegisterRequest): Observable<void> {
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, request)
-      .pipe(tap(({ token }) => this.setSession(token)));
+      .post<void>(`${environment.apiUrl}/auth/register`, request)
+      .pipe(
+        switchMap(() => this.loadCurrentUser()),
+        map(() => undefined)
+      );
   }
 
-  logout(): void {
-    this.tokenState.set(null);
-    this.claimsState.set(null);
+  logout(): Observable<void> {
+    return this.http.post<void>(`${environment.apiUrl}/auth/logout`, {}).pipe(
+      catchError(() => of(undefined)),
+      finalize(() => this.currentUserState.set(null))
+    );
   }
 
-  private setSession(token: string): void {
-    this.tokenState.set(token);
-    this.claimsState.set(this.decodeClaims(token));
-  }
-
-  private decodeClaims(token: string): AuthClaims {
-    try {
-      const encodedPayload = token.split('.')[1];
-      const normalizedPayload = encodedPayload.replace(/-/g, '+').replace(/_/g, '/');
-      const paddedPayload = normalizedPayload.padEnd(Math.ceil(normalizedPayload.length / 4) * 4, '=');
-      const payload = JSON.parse(atob(paddedPayload)) as Partial<AuthClaims>;
-
-      return {
-        userId: typeof payload.userId === 'number' ? payload.userId : null,
-        email: typeof payload.email === 'string' ? payload.email : null,
-        role: typeof payload.role === 'string' ? payload.role : null,
-        clientId: typeof payload.clientId === 'number' ? payload.clientId : null
-      };
-    } catch {
-      return { userId: null, email: null, role: null, clientId: null };
-    }
+  private loadCurrentUser(): Observable<CurrentUser | null> {
+    return this.http.get<CurrentUser>(`${environment.apiUrl}/auth/me`).pipe(
+      tap((user) => this.currentUserState.set(user)),
+      catchError(() => {
+        this.currentUserState.set(null);
+        return of(null);
+      })
+    );
   }
 }

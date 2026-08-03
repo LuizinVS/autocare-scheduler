@@ -22,12 +22,9 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
     <div class="flex min-h-svh flex-col bg-black">
       <app-public-header />
 
-      <main class="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-6 py-12 sm:px-10 sm:py-16 lg:px-16">
+      <main class="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-6 py-6 sm:px-10 sm:py-8 lg:px-16">
         <section class="w-full max-w-md text-center">
-          <p class="text-xs font-semibold uppercase tracking-[0.38em] text-white/45">Comece agora</p>
-          <h1 class="mt-6 text-5xl font-black tracking-[-0.05em] text-white sm:text-6xl">Crie sua conta</h1>
-          <p class="mx-auto mt-5 max-w-sm text-sm leading-6 text-white/55 sm:text-base">Cadastre-se para agendar serviços e cuidar do seu veículo.</p>
-
+          <h1 class="mt-4 text-4xl font-black tracking-[-0.05em] text-white sm:text-5xl">Crie sua conta</h1>
           <form class="mt-10 space-y-5 text-left" [formGroup]="form" (ngSubmit)="submit()">
             <label class="block">
               <span class="mb-2 block text-sm font-semibold text-white/80">Nome</span>
@@ -78,7 +75,7 @@ function passwordsMatch(control: AbstractControl): ValidationErrors | null {
             </button>
           </form>
 
-          <p class="mt-7 text-sm text-white/50">
+          <p class="mt-4 text-sm text-white/50">
             Já tem uma conta?
             <a routerLink="/login" class="font-semibold text-white underline decoration-white/30 underline-offset-4 transition hover:decoration-white">Entrar</a>
           </p>
@@ -121,7 +118,7 @@ export class RegisterPageComponent {
       password
     }).pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
-        next: () => this.router.navigateByUrl('/dashboard'),
+        next: () => this.router.navigateByUrl(this.auth.authenticatedHome()),
         error: (error: unknown) => {
           this.error.set(
             error instanceof HttpErrorResponse && error.status === 409

@@ -43,7 +43,11 @@ export const httpErrorInterceptor: HttpInterceptorFn = (request, next) => {
 
   return next(request).pipe(
     catchError((error: unknown) => {
-      if (error instanceof HttpErrorResponse) {
+      const isExpectedSessionCheck = request.url.endsWith('/auth/me')
+        && error instanceof HttpErrorResponse
+        && error.status === 401;
+
+      if (error instanceof HttpErrorResponse && !isExpectedSessionCheck) {
         feedback.showError(resolveErrorMessage(error));
       }
 
