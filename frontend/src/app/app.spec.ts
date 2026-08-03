@@ -16,12 +16,11 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should render the application shell and navigation', async () => {
+  it('should render only the root router outlet', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Autocare Scheduler');
-    expect(compiled.querySelector('nav')?.textContent).toContain('Agendamentos');
     expect(compiled.querySelectorAll('router-outlet').length).toBe(1);
+    expect(compiled.querySelector('aside')).toBeNull();
   });
 });

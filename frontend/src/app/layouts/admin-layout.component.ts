@@ -1,0 +1,50 @@
+import { Component, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+
+import { FeedbackService } from '../core/services/feedback.service';
+
+@Component({
+  standalone: true,
+  selector: 'app-admin-layout',
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  template: `
+    <div class="min-h-screen bg-neutral-100 px-3 py-3 sm:px-4 sm:py-4 lg:px-6 lg:py-6">
+      <div class="mx-auto flex min-h-[calc(100vh-2rem)] max-w-[1600px] flex-col overflow-hidden rounded-[2rem] bg-white shadow-xl sm:min-h-[calc(100vh-3rem)] lg:min-h-[calc(100vh-4rem)] lg:flex-row">
+        <aside class="flex shrink-0 flex-col bg-slate-900 px-5 py-6 text-white lg:w-64 lg:rounded-l-[2rem] lg:px-6 lg:py-8">
+          <a routerLink="/dashboard" class="block px-2">
+            <p class="text-xs font-semibold uppercase tracking-[0.32em] text-slate-400">Oficina</p>
+            <h1 class="mt-2 text-2xl font-black">{{ title() }}</h1>
+          </a>
+          <nav aria-label="Navegação principal" class="mt-6 flex gap-2 overflow-x-auto text-sm font-semibold lg:mt-12 lg:flex-col lg:overflow-visible">
+            @for (item of navigation; track item.path) {
+              <a [routerLink]="item.path" routerLinkActive="bg-rose-500/90 text-white shadow-sm" [routerLinkActiveOptions]="{ exact: false }" class="whitespace-nowrap rounded-full px-4 py-3 text-slate-300 transition hover:bg-white/10 hover:text-white">{{ item.label }}</a>
+            }
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1 bg-slate-50/70">
+          <main class="p-5 sm:p-8 lg:p-10 xl:p-12">
+            @if (feedback.message(); as message) {
+              <div role="status" class="mb-6 flex items-center justify-between gap-4 rounded-2xl px-4 py-3 text-sm shadow-sm" [class]="message.kind === 'error' ? 'bg-rose-50 text-rose-900' : message.kind === 'success' ? 'bg-emerald-50 text-emerald-900' : 'bg-sky-50 text-sky-900'">
+                <span>{{ message.text }}</span>
+                <button class="rounded-full px-3 py-1 font-semibold hover:bg-black/5" type="button" (click)="feedback.clear()">Fechar</button>
+              </div>
+            }
+            <router-outlet />
+          </main>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class AdminLayoutComponent {
+  protected readonly title = signal('Autocare Scheduler');
+  protected readonly navigation = [
+    { label: 'Dashboard', path: '/dashboard' },
+    { label: 'Clientes', path: '/clients' },
+    { label: 'Veículos', path: '/vehicles' },
+    { label: 'Tipos de Serviço', path: '/service-types' },
+    { label: 'Agendamentos', path: '/appointments' }
+  ] as const;
+
+  constructor(protected readonly feedback: FeedbackService) {}
+}

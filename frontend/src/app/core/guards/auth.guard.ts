@@ -17,6 +17,15 @@ export const authGuard: CanActivateFn = () => {
   );
 };
 
+export const adminGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  const router = inject(Router);
+
+  return auth.initialize().pipe(
+    map(() => auth.role() === 'ADMIN' ? true : router.createUrlTree([auth.isAuthenticated() ? '/my/appointments' : '/login']))
+  );
+};
+
 export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
